@@ -1,6 +1,6 @@
-# Acercándote.org - API de Encuestas y Análisis de datos
+# acercándote.org - Sistema Integral para Diagnóstico Organizacional [API+Backend]
 
-Una API REST desarrollada con FastAPI para la recolección y análisis de datos Economía y Salud Mental. El sistema permite registrar respuestas de encuestas multidimensionales y, en futuras versiones, aplicar algoritmos de clustering para identificar patrones en los datos.
+Una API REST desarrollada con FastAPI para la recolección y análisis en el Sistema Integral para Diangóstico Organizacional (SIDO). El sistema permite registrar respuestas de encuestas multidimensionales y, en futuras versiones, aplicar algoritmos de clustering para identificar patrones en los datos.
 
 ![Python](https://img.shields.io/badge/python-v3.9+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.104.1-green.svg)
@@ -72,8 +72,8 @@ Antes de instalar el proyecto, asegurate de tener:
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/dlimon2/acercandote.org-api-encuestas.git
-cd acercandote.org-api-encuestas
+git clone https://github.com/econopapi/acercandote.org-sido-api.git
+cd acercandote.org-sido-api
 ```
 
 ### 2. Crear y Activar Entorno Virtual
@@ -321,7 +321,7 @@ Este proyecto está licenciado bajo la Licencia MIT. Ver el archivo `LICENSE` pa
 ## 👨‍💻 Autor
 
 **Daniel Limón**
-- GitHub: [@dlimon2](https://github.com/dlimon2)
+- GitHub: [@econopapi](https://github.com/econopapi)
 - Email: dani@dlimon.net
 
 ---
