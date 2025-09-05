@@ -1,6 +1,6 @@
 # acercándote.org - Sistema Integral para Diagnóstico Organizacional [API+Backend]
 
-Una API REST desarrollada con FastAPI para la recolección y análisis en el Sistema Integral para Diangóstico Organizacional (SIDO). El sistema permite registrar respuestas de encuestas multidimensionales y, en futuras versiones, aplicar algoritmos de clustering para identificar patrones en los datos.
+Una API REST desarrollada con FastAPI para la recolección y análisis de datos en el Sistema Integral para Diangóstico Organizacional (SIDO). El sistema permite registrar respuestas de encuestas multidimensionales y, en futuras versiones, aplicar algoritmos de clustering para identificar patrones en los datos.
 
 ![Python](https://img.shields.io/badge/python-v3.9+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.104.1-green.svg)
