@@ -12,7 +12,11 @@ if not DATABASE_URL:
 motor = create_async_engine(
     DATABASE_URL,
     echo=True,  # Para ver las consultas SQL en desarrollo
-    future=True
+    future=True,
+    connect_args={
+        "prepared_statement_cache_size": 0,  # Crucial para PgBouncer
+        "statement_cache_size": 0  # También importante para PgBouncer
+    }
 )
 
 AsyncSessionLocal = async_sessionmaker(
@@ -33,7 +37,6 @@ async def get_db():
             yield session
         finally:
             await session.close()
-
 
 async def create_tables():
     """Crear todas las tablas en la base de datos"""
