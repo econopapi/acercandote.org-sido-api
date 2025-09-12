@@ -36,6 +36,18 @@ class RolesOrganizacion(Base):
     nombre_rol = Column(String(100), nullable=False, unique=True)
 
 
+class Organizaciones(Base):
+    """
+    Modelo SQLAlchemy para la tabla organizaciones
+    Contiene las organizaciones participantes en la encuesta
+    """
+    __tablename__ = "organizaciones"
+    
+    id_organizacion = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre_organizacion = Column(String(200), nullable=False, unique=True)
+    id_sector_organizacion = Column(Integer, nullable=False)
+
+
 class EncuestaLaboralSaludMental(Base):
     """
     Modelo SQLAlchemy para la tabla encuesta_laboral_salud_mental

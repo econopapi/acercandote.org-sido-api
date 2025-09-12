@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 from typing import List, Optional
 from api.database.conexion import get_db
-from api.modelos.encuesta_laboral_salud_mental import EncuestaLaboralSaludMental, EstadosMexico, MunicipiosMexico, RolesOrganizacion
+from api.modelos.encuesta_laboral_salud_mental import EncuestaLaboralSaludMental, EstadosMexico, MunicipiosMexico, RolesOrganizacion, Organizaciones
 from api.schemas.encuesta_laboral_salud_mental import EncuestaCreate, EncuestaResponse, EncuestaListResponse
 from api.servicios.encuesta_laboral_salud_mental import EncuestaService
 
@@ -19,6 +19,37 @@ router = APIRouter(
 def get_encuesta_service() -> EncuestaService:
     """Dependency injection para el servicio de encuestas"""
     return EncuestaService()
+
+
+async def registrar_organizacion(db: AsyncSession,
+                           nombre_organizacion: str,
+                           id_sector_organizacion: int = 5) -> int:
+    """
+    Registra una nueva organización si no existe y devuelve su ID.
+    
+    Args:
+        db: Sesión de base de datos
+        nombre_organizacion: Nombre de la organización
+        id_sector_organizacion: ID del sector al que pertenece. Default 5 (Sin definir)
+        
+    Returns:
+        int: ID de la organización registrada o existente
+    """
+    # Verificar si la organización ya existe
+    result = await db.execute(
+        select(Organizaciones.id_organizacion).where(
+            Organizaciones.nombre_organizacion == nombre_organizacion
+        ))
+    organizacion = result.scalar_one_or_none()
+    if organizacion:
+        return organizacion  # Ya existe, devolver ID existente
+    nueva_organizacion = Organizaciones(
+        nombre_organizacion=nombre_organizacion,
+        id_sector_organizacion=id_sector_organizacion)
+    db.add(nueva_organizacion)
+    await db.commit()
+    await db.refresh(nueva_organizacion)
+    return nueva_organizacion.id_organizacion
 
 
 # Endpoints para obtener las preguntas desde db para el frontend
@@ -66,6 +97,19 @@ async def obtener_roles_organizacion(db: AsyncSession = Depends(get_db)) -> List
     return JSONResponse(content={"roles": roles})
 
 
+#obtener organizaciones
+@router.get("/preguntas/organizaciones",
+            summary="Obtener lista de organizaciones",
+            description="Devuelve una lista de organizaciones para el campo de selección en la encuesta")
+async def obtener_organizaciones(db: AsyncSession = Depends(get_db)) -> List[str]:
+    result = await db.execute(select(Organizaciones.id_organizacion, Organizaciones.nombre_organizacion).order_by(Organizaciones.nombre_organizacion))
+    organizaciones = [{
+            "id": row[0],
+            "nombre": row[1]}
+        for row in result.fetchall()]
+    return JSONResponse(content={"organizaciones": organizaciones})
+
+
 
 @router.get("/", summary="Endpoint de prueba", description="Verifica que el router de encuestas está activo")
 async def prueba_encuesta():
@@ -77,13 +121,11 @@ async def prueba_encuesta():
     response_model=EncuestaResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Registrar nueva respuesta de encuesta",
-    description="Crea un nuevo registro de encuesta de salud mental laboral con todas las respuestas del participante"
-)
+    description="Crea un nuevo registro de encuesta de salud mental laboral con todas las respuestas del participante")
 async def crear_respuesta_encuesta(
     encuesta_data: EncuestaCreate,
     db: AsyncSession = Depends(get_db),
-    encuesta_service: EncuestaService = Depends(get_encuesta_service)
-):
+    encuesta_service: EncuestaService = Depends(get_encuesta_service)):
     """
     Endpoint principal para registrar una nueva respuesta de encuesta.
     
@@ -102,6 +144,13 @@ async def crear_respuesta_encuesta(
         HTTPException: Si hay errores de validación o problemas en la base de datos
     """
     try:
+        # Manejar id_organizacion como int o str
+        if hasattr(encuesta_data, 'id_organizacion') and isinstance(encuesta_data.id_organizacion, str):
+            # Si es string, registrar nueva organización
+            id_organizacion = await registrar_organizacion(db, encuesta_data.id_organizacion)
+            # Actualizar el objeto encuesta_data con el ID obtenido
+            encuesta_data.id_organizacion = id_organizacion
+        
         # Usar el servicio para crear la encuesta
         nueva_encuesta = await encuesta_service.crear_encuesta(db, encuesta_data)
         
@@ -133,8 +182,7 @@ async def crear_respuesta_encuesta(
                 "error": "Error interno del servidor",
                 "message": str(e),
                 "trace": error_trace.splitlines()[-1]  # Última línea del rastreo
-            }
-        )
+            })
 
 
 @router.get(

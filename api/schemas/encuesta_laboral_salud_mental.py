@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 class EncuestaCreate(BaseModel):
     """
@@ -8,7 +8,7 @@ class EncuestaCreate(BaseModel):
     Valida todos los datos de entrada del request JSON
     """
     # Datos básicos del encuestado
-    id_organizacion: int = Field(..., gt=0, description="ID de la organización")
+    id_organizacion: Union[int, str] = Field(..., description="ID de la organización (entero) o nombre para registro nuevo (string)")
     apellidos: str = Field(..., min_length=1, max_length=100, description="Apellidos del encuestado")
     nombres: str = Field(..., min_length=1, max_length=100, description="Nombres del encuestado")
     edad: int = Field(..., ge=14, le=100, description="Edad del encuestado")
