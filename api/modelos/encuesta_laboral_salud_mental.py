@@ -90,6 +90,7 @@ class EncuestaLaboralSaludMental(Base):
     id_nivel_estudios = Column(Integer, nullable=False)
     id_estado_nacimiento = Column(Integer, nullable=False)
     id_estado_mas_anos = Column(Integer, nullable=False)
+    id_municipio = Column(Integer, nullable=True)
     id_estado_civil_padres = Column(Integer, nullable=False)
     
     # Antecedentes familiares de salud (Escala si/no)

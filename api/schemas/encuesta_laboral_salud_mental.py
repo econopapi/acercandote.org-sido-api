@@ -39,6 +39,7 @@ class EncuestaCreate(BaseModel):
     id_nivel_estudios: int = Field(..., ge=0, description="ID nivel de estudios")
     id_estado_nacimiento: int = Field(..., ge=0, description="ID estado de nacimiento")
     id_estado_mas_anos: int = Field(..., ge=0, description="ID estado donde más años vivió")
+    id_municipio: int = Field(..., ge=0, description="ID del municipio donde más años vivió")
     id_estado_civil_padres: int = Field(..., ge=0, description="ID estado civil de los padres")
     
     # Antecedentes familiares (Escala si/no)
