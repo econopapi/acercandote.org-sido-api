@@ -1,10 +1,11 @@
 import traceback
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 from typing import List, Optional
 from api.database.conexion import get_db
-from api.modelos.encuesta_laboral_salud_mental import EncuestaLaboralSaludMental
+from api.modelos.encuesta_laboral_salud_mental import EncuestaLaboralSaludMental, EstadosMexico, MunicipiosMexico, RolesOrganizacion
 from api.schemas.encuesta_laboral_salud_mental import EncuestaCreate, EncuestaResponse, EncuestaListResponse
 from api.servicios.encuesta_laboral_salud_mental import EncuestaService
 
@@ -18,6 +19,52 @@ router = APIRouter(
 def get_encuesta_service() -> EncuestaService:
     """Dependency injection para el servicio de encuestas"""
     return EncuestaService()
+
+
+# Endpoints para obtener las preguntas desde db para el frontend
+
+#obtener estados
+@router.get("/preguntas/estados-mexico",
+            summary="Obtener lista de estados de México",
+            description="Devuelve una lista de estados para el campo de selección en la encuesta")
+async def obtener_estados_mexico(db: AsyncSession = Depends(get_db)) -> List[str]:
+    result = await db.execute(select(EstadosMexico.id_estado, EstadosMexico.nombre_estado).order_by(EstadosMexico.nombre_estado))
+    estados = [{
+            "id": row[0],
+            "nombre": row[1]}
+        for row in result.fetchall()]
+    return JSONResponse(content={"estados": estados})
+
+
+#obtener municipios por estado
+@router.get("/preguntas/municipios-mexico",
+            summary="Obtener lista de municipios de México por estado",
+            description="Devuelve una lista de municipios para el campo de selección en la encuesta, filtrado por estado")
+async def obtener_municipios_mexico(estado: int = Query(..., ge=1, description="ID del estado"),
+                                    db: AsyncSession = Depends(get_db)) -> List[str]:
+    result = await db.execute(select(MunicipiosMexico.id_municipio, MunicipiosMexico.nombre_municipio).where(MunicipiosMexico.id_estado == estado).order_by(MunicipiosMexico.nombre_municipio))
+    municipios = [{
+            "id": row[0],
+            "nombre": row[1]}
+        for row in result.fetchall()]
+    
+    print(f"Municipios encontrados para estado {estado}: {len(municipios)}")  # Debug log
+    
+    return JSONResponse(content={"municipios": municipios})
+
+
+#obtener roles organizacion
+@router.get("/preguntas/roles-organizacion",
+            summary="Obtener lista de roles dentro de una organización",
+            description="Devuelve una lista de roles para el campo de selección en la encuesta")
+async def obtener_roles_organizacion(db: AsyncSession = Depends(get_db)) -> List[str]:
+    result = await db.execute(select(RolesOrganizacion.id_rol_organizacion, RolesOrganizacion.nombre_rol).order_by(RolesOrganizacion.nombre_rol))
+    roles = [{
+            "id": row[0],
+            "nombre": row[1]}
+        for row in result.fetchall()]
+    return JSONResponse(content={"roles": roles})
+
 
 
 @router.get("/", summary="Endpoint de prueba", description="Verifica que el router de encuestas está activo")

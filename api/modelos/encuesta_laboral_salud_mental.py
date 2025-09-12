@@ -2,6 +2,40 @@ from sqlalchemy import Column, Integer, String, DateTime, Float
 from sqlalchemy.sql import func
 from api.database.conexion import Base
 
+class EstadosMexico(Base):
+    """
+    Modelo SQLAlchemy para la tabla estados_mexico
+    Contiene los estados de México para referencias en encuestas
+    """
+    __tablename__ = "estados_mexico"
+    
+    id_estado = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre_estado = Column(String(100), nullable=False, unique=True)
+
+
+class MunicipiosMexico(Base):
+    """
+    Modelo SQLAlchemy para la tabla municipios_mexico
+    Contiene los municipios de México para referencias en encuestas
+    """
+    __tablename__ = "municipios"
+    
+    id_municipio = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id_estado = Column(Integer, nullable=False, index=True)
+    nombre_municipio = Column(String(100), nullable=False)
+
+
+class RolesOrganizacion(Base):
+    """
+    Modelo SQLAlchemy para la tabla roles_organizacion
+    Contiene los roles dentro de una organización para referencias en encuestas
+    """
+    __tablename__ = "roles_organizacion"
+    
+    id_rol_organizacion = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre_rol = Column(String(100), nullable=False, unique=True)
+
+
 class EncuestaLaboralSaludMental(Base):
     """
     Modelo SQLAlchemy para la tabla encuesta_laboral_salud_mental
