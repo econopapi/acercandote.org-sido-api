@@ -13,9 +13,15 @@ motor = create_async_engine(
     DATABASE_URL,
     echo=True,  # Para ver las consultas SQL en desarrollo
     future=True,
+    # Configuración optimizada para PgBouncer con psycopg3
+    pool_pre_ping=True,
+    pool_recycle=300,
+    pool_timeout=60,
     connect_args={
-        "prepared_statement_cache_size": 0,  # Crucial para PgBouncer
-        "statement_cache_size": 0  # También importante para PgBouncer
+        # psycopg3 usa "options" en lugar de "server_settings"
+        "options": "-c application_name=acercandote_api -c default_transaction_isolation=read_committed",
+        # Configuración adicional para PgBouncer
+        "prepare_threshold": None,  # Desactivar prepared statements
     }
 )
 
